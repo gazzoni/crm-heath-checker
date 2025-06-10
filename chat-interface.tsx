@@ -280,29 +280,54 @@ export default function ChatInterface() {
 
   const sendMessageToN8N = async (userMessage: string): Promise<string> => {
     try {
+      console.log('🚀 Enviando mensagem para n8n:', userMessage)
+      console.log('📡 URL do webhook:', N8N_WEBHOOK_URL)
+      
+      const payload = {
+        message: userMessage,
+        timestamp: new Date().toISOString(),
+        sessionId: `session-${Date.now()}`,
+      }
+      
+      console.log('📦 Payload:', payload)
+      
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: userMessage,
-          timestamp: new Date().toISOString(),
-          sessionId: `session-${Date.now()}`, // Você pode usar um ID de sessão mais persistente se necessário
-        }),
+        body: JSON.stringify(payload),
       })
 
+      console.log('📨 Status da resposta:', response.status)
+      console.log('🔍 Headers da resposta:', Object.fromEntries(response.headers.entries()))
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        console.error('❌ Erro HTTP:', response.status, errorText)
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
       }
 
       const data = await response.json()
+      console.log('✅ Resposta recebida do n8n:', data)
       
       // Adapte conforme a estrutura de resposta do seu webhook n8n
-      // Assumindo que a resposta vem em data.response ou data.message
-      return data.response || data.message || data.text || 'Desculpe, não consegui processar sua mensagem.'
+      const aiResponse = data.response || data.message || data.text || data.result
+      
+      if (!aiResponse) {
+        console.warn('⚠️ Resposta vazia do n8n. Estrutura recebida:', data)
+        return 'Desculpe, recebi uma resposta vazia do servidor.'
+      }
+      
+      return aiResponse
     } catch (error) {
-      console.error('Erro ao conectar com n8n:', error)
+      console.error('💥 Erro ao conectar com n8n:', error)
+      
+      // Verificar se é erro de rede ou CORS
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return 'Erro de conexão: Verifique se o webhook n8n está acessível e configurado corretamente.'
+      }
+      
       return 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.'
     }
   }
