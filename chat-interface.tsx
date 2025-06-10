@@ -5,7 +5,6 @@ import "ios-vibrator-pro-max"
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import {
-  Search,
   Plus,
   Lightbulb,
   ArrowUp,
@@ -21,7 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-type ActiveButton = "none" | "add" | "deepSearch" | "think"
+type ActiveButton = "none" | "add" | "think"
 type MessageType = "user" | "system"
 
 interface Message {
@@ -557,7 +556,7 @@ export default function ChatInterface() {
             <span className="sr-only">Menu</span>
           </Button>
 
-          <h1 className="text-base font-medium text-gray-800">v0 Chat</h1>
+          <h1 className="text-base font-medium text-gray-800">CRM Health Checker</h1>
 
           <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
             <PenSquare className="h-5 w-5 text-gray-700" />
@@ -638,21 +637,7 @@ export default function ChatInterface() {
                     <span className="sr-only">Add</span>
                   </Button>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className={cn(
-                      "rounded-full h-8 px-3 flex items-center border-gray-200 gap-1.5 transition-colors",
-                      activeButton === "deepSearch" && "bg-gray-100 border-gray-300",
-                    )}
-                    onClick={() => toggleButton("deepSearch")}
-                    disabled={isStreaming}
-                  >
-                    <Search className={cn("h-4 w-4 text-gray-500", activeButton === "deepSearch" && "text-gray-700")} />
-                    <span className={cn("text-gray-900 text-sm", activeButton === "deepSearch" && "font-medium")}>
-                      DeepSearch
-                    </span>
-                  </Button>
+
 
                   <Button
                     type="button"
