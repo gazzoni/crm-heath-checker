@@ -1,6 +1,7 @@
 "use client"
 
 import "ios-vibrator-pro-max"
+import "highlight.js/styles/github.css"
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
@@ -19,6 +20,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
 
 type ActiveButton = "none" | "add" | "think"
 type MessageType = "user" | "system"
@@ -492,14 +496,38 @@ export default function ChatInterface() {
         <div
           className={cn(
             "max-w-[80%] px-4 py-2 rounded-2xl",
-            message.type === "user" ? "bg-white border border-gray-200 rounded-br-none" : "text-gray-900",
+            message.type === "user" 
+              ? "bg-white border border-gray-200 rounded-br-none" 
+              : "text-gray-900 bg-gray-100 rounded-bl-none",
           )}
         >
-          {/* For user messages or completed system messages, render without animation */}
-          {message.content && (
-            <span className={message.type === "system" && !isCompleted ? "animate-fade-in" : ""}>
-              {message.content}
-            </span>
+          {/* For user messages, render as plain text */}
+          {message.type === "user" && message.content && (
+            <span>{message.content}</span>
+          )}
+
+          {/* For completed system messages, render with markdown */}
+          {message.type === "system" && message.content && (
+            <div className={message.type === "system" && !isCompleted ? "animate-fade-in" : ""}>
+              <div className="prose prose-sm max-w-none prose-slate dark:prose-invert
+                prose-headings:font-semibold prose-headings:text-gray-900
+                prose-p:text-gray-800 prose-p:leading-relaxed
+                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-gray-900 prose-strong:font-semibold
+                prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
+                prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
+                prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic
+                prose-ul:list-disc prose-ol:list-decimal prose-li:text-gray-800
+                prose-table:border-collapse prose-th:border prose-th:border-gray-300 prose-th:px-3 prose-th:py-2 prose-th:bg-gray-50
+                prose-td:border prose-td:border-gray-300 prose-td:px-3 prose-td:py-2">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </div>
+            </div>
           )}
 
           {/* For streaming messages, render with animation */}
